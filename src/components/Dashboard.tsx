@@ -1,8 +1,7 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Users, Target, Clock, Award, MapPin } from 'lucide-react';
+import { TrendingUp, Users, Target, Clock, Award, MapPin, Trophy } from 'lucide-react';
 
 const Dashboard = () => {
   const weeklyStats = [
