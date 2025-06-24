@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,8 +28,8 @@ const Dashboard = () => {
     <div className="space-y-6">
       {/* Welcome Header */}
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-slate-800 mb-2">Welcome to PaceArena</h2>
-        <p className="text-slate-600">Track performance, compete with clubs, and achieve your running goals</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">Welcome to PaceArena</h2>
+        <p className="text-sm md:text-base text-slate-600">Track performance, compete with clubs, and achieve your running goals</p>
       </div>
 
       {/* Weekly Stats Grid */}
@@ -38,15 +39,15 @@ const Dashboard = () => {
           return (
             <Card key={index} className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
               <CardContent className="p-4">
-                <div className="flex items-center justifybetween mb-2">
-                  <IconComponent className="w-5 h-5 text-purple-600" />
+                <div className="flex items-center justify-between mb-2">
+                  <IconComponent className="w-4 h-4 md:w-5 md:h-5 text-purple-600" />
                   <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
                     {stat.change}
                   </Badge>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-2xl font-bold text-slate-800">{stat.value}</p>
-                  <p className="text-sm text-slate-600">{stat.label}</p>
+                  <p className="text-xl md:text-2xl font-bold text-slate-800">{stat.value}</p>
+                  <p className="text-xs md:text-sm text-slate-600">{stat.label}</p>
                 </div>
               </CardContent>
             </Card>
@@ -57,19 +58,19 @@ const Dashboard = () => {
       {/* Distance Group Buttons */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <Button 
-          className="h-16 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-lg"
+          className="h-14 md:h-16 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-lg"
         >
           <div className="text-center">
-            <div className="font-semibold">Short Distance</div>
-            <div className="text-sm opacity-90">&lt; 5 Miles</div>
+            <div className="font-semibold text-sm md:text-base">Short Distance</div>
+            <div className="text-xs md:text-sm opacity-90">&lt; 5 Miles</div>
           </div>
         </Button>
         <Button 
-          className="h-16 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg"
+          className="h-14 md:h-16 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg"
         >
           <div className="text-center">
-            <div className="font-semibold">Long Distance</div>
-            <div className="text-sm opacity-90">10+ Miles</div>
+            <div className="font-semibold text-sm md:text-base">Long Distance</div>
+            <div className="text-xs md:text-sm opacity-90">10+ Miles</div>
           </div>
         </Button>
       </div>
@@ -77,8 +78,8 @@ const Dashboard = () => {
       {/* Weekly Challenges */}
       <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Award className="w-5 h-5 text-purple-600" />
+          <CardTitle className="flex items-center space-x-2 text-lg md:text-xl">
+            <Award className="w-4 h-4 md:w-5 md:h-5 text-purple-600" />
             <span>Weekly Challenges</span>
           </CardTitle>
         </CardHeader>
@@ -86,10 +87,10 @@ const Dashboard = () => {
           {challenges.map((challenge, index) => (
             <div key={index} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
               <div>
-                <p className="font-semibold text-slate-800">{challenge.title}</p>
-                <p className="text-sm text-slate-600">{challenge.participants} participants</p>
+                <p className="font-semibold text-slate-800 text-sm md:text-base">{challenge.title}</p>
+                <p className="text-xs md:text-sm text-slate-600">{challenge.participants} participants</p>
               </div>
-              <Badge variant="outline" className="text-purple-600 border-purple-600">
+              <Badge variant="outline" className="text-purple-600 border-purple-600 text-xs">
                 {challenge.daysLeft}d left
               </Badge>
             </div>
@@ -100,25 +101,25 @@ const Dashboard = () => {
       {/* Top Performing Clubs */}
       <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Trophy className="w-5 h-5 text-purple-600" />
+          <CardTitle className="flex items-center space-x-2 text-lg md:text-xl">
+            <Trophy className="w-4 h-4 md:w-5 md:h-5 text-purple-600" />
             <span>Top Performing Clubs</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {topClubs.map((club, index) => (
             <div key={index} className="flex items-center space-x-4 p-3 bg-slate-50 rounded-lg">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+              <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center ${
                 club.badge === 'gold' ? 'bg-yellow-100' :
                 club.badge === 'silver' ? 'bg-gray-100' : 'bg-orange-100'
               }`}>
-                <span className="text-sm font-bold">
+                <span className="text-xs md:text-sm font-bold">
                   {club.badge === 'gold' ? '🥇' : club.badge === 'silver' ? '🥈' : '🥉'}
                 </span>
               </div>
               <div className="flex-1">
-                <p className="font-semibold text-slate-800">{club.name}</p>
-                <p className="text-sm text-slate-600">{club.members} members • {club.avgPace} avg pace</p>
+                <p className="font-semibold text-slate-800 text-sm md:text-base">{club.name}</p>
+                <p className="text-xs md:text-sm text-slate-600">{club.members} members • {club.avgPace} avg pace</p>
               </div>
             </div>
           ))}

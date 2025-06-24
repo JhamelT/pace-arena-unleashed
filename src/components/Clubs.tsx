@@ -57,15 +57,18 @@ const Clubs = () => {
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-3xl font-bold text-slate-800 mb-2">Clubs</h2>
-        <p className="text-slate-600">Connect with your running community</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">Clubs</h2>
+        <p className="text-sm md:text-base text-slate-600 mb-3">Connect with your running community</p>
+        <p className="text-xs md:text-sm text-slate-500 leading-relaxed max-w-2xl mx-auto">
+          Analytics and insights for running communities. Track your progress, optimize performance, and scale club engagement.
+        </p>
       </div>
 
       {/* New Clubs Spotlight */}
       <Card className="bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 shadow-lg">
         <CardHeader>
-          <CardTitle className="text-white flex items-center space-x-2">
-            <Users className="w-5 h-5" />
+          <CardTitle className="text-white flex items-center space-x-2 text-lg md:text-xl">
+            <Users className="w-4 h-4 md:w-5 md:h-5" />
             <span>New Clubs</span>
           </CardTitle>
         </CardHeader>
@@ -73,10 +76,10 @@ const Clubs = () => {
           {newClubs.map((club, index) => (
             <div key={index} className="flex items-center justify-between p-3 bg-white/10 rounded-lg backdrop-blur-sm">
               <div>
-                <p className="font-semibold">{club.name}</p>
-                <p className="text-sm opacity-80">{club.location} • {club.members} members</p>
+                <p className="font-semibold text-sm md:text-base">{club.name}</p>
+                <p className="text-xs md:text-sm opacity-80">{club.location} • {club.members} members</p>
               </div>
-              <Badge variant="secondary" className="bg-white/20 text-white border-0">
+              <Badge variant="secondary" className="bg-white/20 text-white border-0 text-xs">
                 {club.founded}
               </Badge>
             </div>
@@ -91,15 +94,15 @@ const Clubs = () => {
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <Avatar className="w-10 h-10">
+                  <Avatar className="w-8 h-8 md:w-10 md:h-10">
                     <AvatarImage src="/placeholder.svg" />
-                    <AvatarFallback className="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+                    <AvatarFallback className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs">
                       {post.clubName.split(' ').map(word => word[0]).join('')}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-semibold text-slate-800">{post.clubName}</p>
-                    <div className="flex items-center text-sm text-slate-600">
+                    <p className="font-semibold text-slate-800 text-sm md:text-base">{post.clubName}</p>
+                    <div className="flex items-center text-xs md:text-sm text-slate-600">
                       <MapPin className="w-3 h-3 mr-1" />
                       <span>{post.location} • {post.members} members • {post.timeAgo}</span>
                     </div>
@@ -108,17 +111,17 @@ const Clubs = () => {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-slate-700 leading-relaxed">{post.content}</p>
+              <p className="text-slate-700 leading-relaxed text-sm md:text-base">{post.content}</p>
               
               {/* Post Image */}
               <div className="rounded-lg overflow-hidden bg-slate-100 h-48 flex items-center justify-center">
-                <span className="text-slate-500">📷 Club Photo</span>
+                <span className="text-slate-500 text-sm">📷 Club Photo</span>
               </div>
 
               {/* Hashtags */}
               <div className="flex flex-wrap gap-2">
                 {post.hashtags.map((hashtag, index) => (
-                  <Badge key={index} variant="secondary" className="bg-purple-100 text-purple-700">
+                  <Badge key={index} variant="secondary" className="bg-purple-100 text-purple-700 text-xs">
                     {hashtag}
                   </Badge>
                 ))}
@@ -129,11 +132,11 @@ const Clubs = () => {
                 <div className="flex items-center space-x-4">
                   <button className="flex items-center space-x-2 text-slate-600 hover:text-red-500 transition-colors">
                     <Heart className="w-4 h-4" />
-                    <span className="text-sm">{post.likes}</span>
+                    <span className="text-xs md:text-sm">{post.likes}</span>
                   </button>
                   <button className="flex items-center space-x-2 text-slate-600 hover:text-blue-500 transition-colors">
                     <MessageCircle className="w-4 h-4" />
-                    <span className="text-sm">{post.comments}</span>
+                    <span className="text-xs md:text-sm">{post.comments}</span>
                   </button>
                 </div>
                 <button className="text-slate-600 hover:text-purple-600 transition-colors">
