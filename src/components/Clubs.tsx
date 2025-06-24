@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Heart, MessageCircle, Share, Users, MapPin, Calendar } from 'lucide-react';
+import { Heart, MessageCircle, Share, Users, MapPin, Calendar, TrendingUp, Zap, Activity } from 'lucide-react';
 
 const Clubs = () => {
   const [selectedClub, setSelectedClub] = useState('all');
@@ -20,7 +20,15 @@ const Clubs = () => {
       image: '/placeholder.svg',
       likes: 24,
       comments: 8,
-      hashtags: ['#BrooklyBridge', '#SunriseRun', '#PaceGroup']
+      hashtags: ['#BrooklyBridge', '#SunriseRun', '#PaceGroup'],
+      intensity: 'High Intensity',
+      trainingType: 'Speed work interval training',
+      growthPercentage: '+15%',
+      activityStats: {
+        likes: 18,
+        comments: 5,
+        participants: 12
+      }
     },
     {
       id: 2,
@@ -32,7 +40,15 @@ const Clubs = () => {
       image: '/placeholder.svg',
       likes: 31,
       comments: 12,
-      hashtags: ['#CentralPark', '#LongRun', '#Endurance']
+      hashtags: ['#CentralPark', '#LongRun', '#Endurance'],
+      intensity: 'Moderate',
+      trainingType: 'Endurance base building',
+      growthPercentage: '+8%',
+      activityStats: {
+        likes: 31,
+        comments: 12,
+        participants: 18
+      }
     },
     {
       id: 3,
@@ -44,7 +60,15 @@ const Clubs = () => {
       image: '/placeholder.svg',
       likes: 18,
       comments: 5,
-      hashtags: ['#SpeedWork', '#TrackTuesday', '#NewPR']
+      hashtags: ['#SpeedWork', '#TrackTuesday', '#NewPR'],
+      intensity: 'High Intensity',
+      trainingType: 'Multiple PR breakthroughs',
+      growthPercentage: '+12%',
+      activityStats: {
+        likes: 18,
+        comments: 5,
+        participants: 8
+      }
     },
   ];
 
@@ -53,6 +77,25 @@ const Clubs = () => {
     { name: 'LIC Morning Runners', location: 'Queens, NY', members: 8, founded: '3 days ago' },
     { name: 'Staten Island Striders', location: 'Staten Island, NY', members: 15, founded: '2 weeks ago' },
   ];
+
+  const getIntensityColor = (intensity: string) => {
+    switch (intensity.toLowerCase()) {
+      case 'high intensity': return 'bg-red-100 text-red-700 border-red-200';
+      case 'moderate': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      case 'low intensity': return 'bg-green-100 text-green-700 border-green-200';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
+  const getTrainingTypeIcon = (trainingType: string) => {
+    if (trainingType.toLowerCase().includes('speed') || trainingType.toLowerCase().includes('interval')) {
+      return <Zap className="w-3 h-3" />;
+    } else if (trainingType.toLowerCase().includes('pr') || trainingType.toLowerCase().includes('breakthrough')) {
+      return <TrendingUp className="w-3 h-3" />;
+    } else {
+      return <Activity className="w-3 h-3" />;
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -116,6 +159,41 @@ const Clubs = () => {
               {/* Post Image */}
               <div className="rounded-lg overflow-hidden bg-slate-100 h-48 flex items-center justify-center">
                 <span className="text-slate-500 text-sm">📷 Club Photo</span>
+              </div>
+
+              {/* Activity Tracking Section */}
+              <div className="bg-slate-50 rounded-lg p-3 space-y-3">
+                <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center space-x-2">
+                    {getTrainingTypeIcon(post.trainingType)}
+                    <span className="text-slate-700 font-medium">{post.trainingType}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <TrendingUp className="w-3 h-3 text-green-600" />
+                    <span className="text-green-600 font-semibold">{post.growthPercentage} this week</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <Badge className={`text-xs border ${getIntensityColor(post.intensity)}`}>
+                    <Activity className="w-3 h-3 mr-1" />
+                    {post.intensity}
+                  </Badge>
+                  <div className="flex items-center space-x-4 text-xs text-slate-600">
+                    <div className="flex items-center space-x-1">
+                      <Heart className="w-3 h-3 text-red-500" />
+                      <span>{post.activityStats.likes}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <MessageCircle className="w-3 h-3 text-blue-500" />
+                      <span>{post.activityStats.comments}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Users className="w-3 h-3 text-purple-500" />
+                      <span>{post.activityStats.participants}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Hashtags */}
