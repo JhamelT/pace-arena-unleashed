@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,8 +24,8 @@ const Clubs = () => {
       trainingType: 'Speed work interval training',
       growthPercentage: '+15%',
       activityStats: {
-        likes: 18,
-        comments: 5,
+        likes: 24,
+        comments: 8,
         participants: 12
       }
     },
