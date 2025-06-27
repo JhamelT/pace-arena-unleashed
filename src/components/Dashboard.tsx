@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,10 +5,10 @@ import { TrendingUp, Users, Target, Clock, Award, MapPin, Trophy } from 'lucide-
 
 const Dashboard = () => {
   const weeklyStats = [
-    { label: 'Active Clubs', value: '47', change: '+12%', icon: Users, gradient: 'from-blue-500 to-blue-600' },
-    { label: 'Total Runners', value: '1,247', change: '+8%', icon: Target, gradient: 'from-green-500 to-green-600' },
-    { label: 'Miles This Week', value: '3,892', change: '+15%', icon: TrendingUp, gradient: 'from-purple-500 to-purple-600' },
-    { label: 'Avg Pace', value: '8:42', change: '-0:23', icon: Clock, gradient: 'from-orange-500 to-orange-600' },
+    { label: 'Active Clubs', value: '47', change: '+12%', icon: Users, gradient: 'from-purple-500 to-purple-600' },
+    { label: 'Total Runners', value: '1,247', change: '+8%', icon: Target, gradient: 'from-blue-500 to-blue-600' },
+    { label: 'Miles This Week', value: '3,892', change: '+15%', icon: TrendingUp, gradient: 'from-purple-600 to-blue-600' },
+    { label: 'Avg Pace', value: '8:42', change: '-0:23', icon: Clock, gradient: 'from-blue-600 to-purple-600' },
   ];
 
   const topClubs = [
