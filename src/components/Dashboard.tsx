@@ -6,10 +6,10 @@ import { TrendingUp, Users, Target, Clock, Award, MapPin, Trophy } from 'lucide-
 
 const Dashboard = () => {
   const weeklyStats = [
-    { label: 'Active Clubs', value: '47', change: '+12%', icon: Users },
-    { label: 'Total Runners', value: '1,247', change: '+8%', icon: Target },
-    { label: 'Miles This Week', value: '3,892', change: '+15%', icon: TrendingUp },
-    { label: 'Avg Pace', value: '8:42', change: '-0:23', icon: Clock },
+    { label: 'Active Clubs', value: '47', change: '+12%', icon: Users, gradient: 'from-blue-500 to-blue-600' },
+    { label: 'Total Runners', value: '1,247', change: '+8%', icon: Target, gradient: 'from-green-500 to-green-600' },
+    { label: 'Miles This Week', value: '3,892', change: '+15%', icon: TrendingUp, gradient: 'from-purple-500 to-purple-600' },
+    { label: 'Avg Pace', value: '8:42', change: '-0:23', icon: Clock, gradient: 'from-orange-500 to-orange-600' },
   ];
 
   const topClubs = [
@@ -37,17 +37,17 @@ const Dashboard = () => {
         {weeklyStats.map((stat, index) => {
           const IconComponent = stat.icon;
           return (
-            <Card key={index} className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+            <Card key={index} className={`bg-gradient-to-r ${stat.gradient} text-white border-0 shadow-lg`}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <IconComponent className="w-4 h-4 md:w-5 md:h-5 text-purple-600" />
-                  <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
+                  <IconComponent className="w-4 h-4 md:w-5 md:h-5 text-white" />
+                  <Badge variant="secondary" className="text-xs bg-white/20 text-white border-white/30">
                     {stat.change}
                   </Badge>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xl md:text-2xl font-bold text-slate-800">{stat.value}</p>
-                  <p className="text-xs md:text-sm text-slate-600">{stat.label}</p>
+                  <p className="text-xl md:text-2xl font-bold text-white">{stat.value}</p>
+                  <p className="text-xs md:text-sm text-white/90">{stat.label}</p>
                 </div>
               </CardContent>
             </Card>
