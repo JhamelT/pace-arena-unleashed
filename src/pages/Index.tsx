@@ -9,6 +9,7 @@ import Navigation from '@/components/Navigation';
 import Dashboard from '@/components/Dashboard';
 import Leaderboard from '@/components/Leaderboard';
 import Clubs from '@/components/Clubs';
+import ClubDashboard from '@/components/ClubDashboard';
 import Events from '@/components/Events';
 import Setup from '@/components/Setup';
 
@@ -47,6 +48,9 @@ const Index = () => {
           </TabsContent>
           <TabsContent value="clubs" className="mt-0">
             <Clubs />
+          </TabsContent>
+          <TabsContent value="club-dashboard" className="mt-0">
+            <ClubDashboard />
           </TabsContent>
           <TabsContent value="events" className="mt-0">
             <Events />
