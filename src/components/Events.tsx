@@ -1,14 +1,42 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, MapPin, Users, Clock, Cloud, Sun, CloudRain } from 'lucide-react';
+import { Calendar, MapPin, Users, Clock, Cloud, Sun, CloudRain, Navigation } from 'lucide-react';
 
 const Events = () => {
   const [selectedClub, setSelectedClub] = useState('');
+  const [locationPermission, setLocationPermission] = useState<'prompt' | 'granted' | 'denied'>('prompt');
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+
+  const requestLocation = async () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by this browser.');
+      return;
+    }
+
+    try {
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000 // Cache for 5 minutes
+        });
+      });
+
+      setUserLocation({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      });
+      setLocationPermission('granted');
+    } catch (error) {
+      console.error('Error getting location:', error);
+      setLocationPermission('denied');
+    }
+  };
 
   const publicEvents = [
     {
@@ -103,15 +131,67 @@ const Events = () => {
         </TabsList>
 
         <TabsContent value="public" className="space-y-4">
-          <Card className="bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 shadow-lg">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-2 mb-2">
-                <MapPin className="w-4 h-4" />
-                <span className="text-sm">Within 25 miles of your location</span>
-              </div>
-              <p className="text-xs opacity-80">Enable location services to see nearby events</p>
-            </CardContent>
-          </Card>
+          {locationPermission === 'prompt' && (
+            <Card className="bg-gradient-to-r from-purple-600 to-blue-600 text-white border-0 shadow-lg">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Navigation className="w-5 h-5" />
+                    <div>
+                      <p className="font-semibold">Enable Location Services</p>
+                      <p className="text-sm opacity-90">Find running events within 25 miles of you</p>
+                    </div>
+                  </div>
+                  <Button 
+                    onClick={requestLocation}
+                    variant="secondary"
+                    size="sm"
+                    className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+                  >
+                    Enable
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {locationPermission === 'granted' && (
+            <Card className="bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0 shadow-lg">
+              <CardContent className="p-4">
+                <div className="flex items-center space-x-2">
+                  <MapPin className="w-4 h-4" />
+                  <div>
+                    <p className="font-semibold text-sm">Location Enabled</p>
+                    <p className="text-xs opacity-90">Showing events within 25 miles of your location</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {locationPermission === 'denied' && (
+            <Card className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 shadow-lg">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <MapPin className="w-4 h-4" />
+                    <div>
+                      <p className="font-semibold text-sm">Location Access Denied</p>
+                      <p className="text-xs opacity-90">Enable location in browser settings to see nearby events</p>
+                    </div>
+                  </div>
+                  <Button 
+                    onClick={requestLocation}
+                    variant="secondary"
+                    size="sm"
+                    className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+                  >
+                    Retry
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {publicEvents.map((event, index) => (
             <Card key={index} className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">

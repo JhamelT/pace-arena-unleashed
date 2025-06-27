@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,14 +20,18 @@ import {
 } from 'lucide-react';
 
 const ClubDashboard = () => {
-  const [selectedClub] = useState('Brooklyn Bridge Runners');
+  // In production, this would come from user's profile/selected club
+  const [userClub] = useState({
+    name: 'Central Park Pacers', // This would be fetched from user's profile
+    location: 'Manhattan, NY',
+    joinedDate: '2024-08-15'
+  });
   
   const clubStats = {
     totalMembers: 89,
     activeThisWeek: 67,
     averagePace: '7:45',
-    totalDistance: 2847,
-    weeklyGoal: 3000,
+    weeklyMiles: 2847, // Total miles completed this week
     improvement: '+12%'
   };
 
@@ -56,14 +60,16 @@ const ClubDashboard = () => {
     { day: 'Sun', completed: 89, target: 100 }
   ];
 
-  const completionPercentage = (clubStats.totalDistance / clubStats.weeklyGoal) * 100;
-
   return (
     <div className="space-y-4 pb-4">
       {/* Club Header */}
-      <div className="text-center mb-4">
-        <h2 className="text-xl md:text-2xl font-bold text-slate-800 mb-1">{selectedClub}</h2>
-        <p className="text-sm text-slate-600">Performance Dashboard</p>
+      <div className="text-center mb-6">
+        <h2 className="text-xl md:text-2xl font-bold text-slate-800 mb-1">{userClub.name}</h2>
+        <div className="flex items-center justify-center space-x-2 text-sm text-slate-600">
+          <MapPin className="w-4 h-4" />
+          <span>{userClub.location}</span>
+        </div>
+        <p className="text-xs text-slate-500 mt-1">Member since {new Date(userClub.joinedDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
       </div>
 
       {/* Key Stats Overview */}
@@ -117,24 +123,28 @@ const ClubDashboard = () => {
         </Card>
       </div>
 
-      {/* Weekly Goal Progress */}
+      {/* Weekly Miles Progress */}
       <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center justify-between text-base">
             <span className="flex items-center space-x-2">
               <Target className="w-4 h-4" />
-              <span>Weekly Goal Progress</span>
+              <span>Weekly Miles Total</span>
             </span>
             <Badge variant="outline" className="text-xs">
-              {clubStats.totalDistance}/{clubStats.weeklyGoal} miles
+              {clubStats.weeklyMiles} miles completed
             </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <Progress value={completionPercentage} className="h-3" />
-          <div className="flex justify-between text-xs text-slate-600">
-            <span>{Math.round(completionPercentage)}% Complete</span>
-            <span>{clubStats.weeklyGoal - clubStats.totalDistance} miles to go</span>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-purple-600 mb-1">{clubStats.weeklyMiles}</div>
+            <div className="text-sm text-slate-600">Total miles this week</div>
+          </div>
+          <div className="flex justify-center">
+            <Badge variant="secondary" className="bg-green-100 text-green-700">
+              {clubStats.improvement} from last week
+            </Badge>
           </div>
         </CardContent>
       </Card>
