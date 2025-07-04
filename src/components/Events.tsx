@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, MapPin, Users, Clock, Cloud, Sun, CloudRain, Navigation } from 'lucide-react';
+import EventRegistrationDialog from '@/components/EventRegistrationDialog';
 
 const Events = () => {
   const [selectedClub, setSelectedClub] = useState('');
@@ -230,9 +231,11 @@ const Events = () => {
                     </div>
                   </div>
                 </div>
-                <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
-                  Register for Event
-                </Button>
+                <EventRegistrationDialog eventName={event.name} eventType="public">
+                  <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
+                    Register for Event
+                  </Button>
+                </EventRegistrationDialog>
               </CardContent>
             </Card>
           ))}
@@ -291,9 +294,11 @@ const Events = () => {
                     ))}
                   </div>
                 </div>
-                <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-                  Join Event
-                </Button>
+                <EventRegistrationDialog eventName={event.name} eventType="club">
+                  <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                    Join Event
+                  </Button>
+                </EventRegistrationDialog>
               </CardContent>
             </Card>
           ))}
