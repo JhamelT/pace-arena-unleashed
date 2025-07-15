@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import RunVerificationCard from './RunVerificationCard';
 
 interface Club {
   id: string;
@@ -70,6 +71,8 @@ const UserAccountForm = ({
 
   return (
     <div className="space-y-6">
+      <RunVerificationCard />
+      
       <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
         <CardHeader>
           <CardTitle className="text-slate-800">Create Individual Account</CardTitle>
