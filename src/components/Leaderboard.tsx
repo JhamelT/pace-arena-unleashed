@@ -35,12 +35,20 @@ const Leaderboard = () => {
       </div>
 
       <Tabs defaultValue="short" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="short" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-            Short Distance (&lt; 5 miles)
+        <TabsList className="grid w-full grid-cols-2 mb-6 h-auto p-1">
+          <TabsTrigger 
+            value="short" 
+            className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-xs sm:text-sm px-2 py-3 whitespace-nowrap"
+          >
+            <span className="hidden sm:inline">Short Distance (&lt; 5 miles)</span>
+            <span className="sm:hidden">Short (&lt; 5 mi)</span>
           </TabsTrigger>
-          <TabsTrigger value="long" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-            Long Distance (10+ miles)
+          <TabsTrigger 
+            value="long" 
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-xs sm:text-sm px-2 py-3 whitespace-nowrap"
+          >
+            <span className="hidden sm:inline">Long Distance (10+ miles)</span>
+            <span className="sm:hidden">Long (10+ mi)</span>
           </TabsTrigger>
         </TabsList>
 
