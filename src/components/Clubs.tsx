@@ -16,7 +16,7 @@ const Clubs = () => {
       members: 89,
       timeAgo: '2h ago',
       content: 'Amazing sunrise run across the Brooklyn Bridge this morning! Perfect weather and great pace group energy. Our 7:45 group crushed their 5K goal today. 🌅🏃‍♂️',
-      image: '/placeholder.svg',
+      image: '/lovable-uploads/f66ef395-5ec8-4009-985d-eaef1eb23426.png',
       likes: 24,
       comments: 8,
       hashtags: ['#BrooklyBridge', '#SunriseRun', '#PaceGroup'],
@@ -36,7 +36,7 @@ const Clubs = () => {
       members: 76,
       timeAgo: '4h ago',
       content: 'Weekly long run complete! 12 miles through Central Park with our endurance group. Weather was perfect and everyone hit their target paces. Great job team!',
-      image: '/placeholder.svg',
+      image: '/lovable-uploads/54b81201-3199-46d0-acb4-bf70202acdd9.png',
       likes: 31,
       comments: 12,
       hashtags: ['#CentralPark', '#LongRun', '#Endurance'],
@@ -56,7 +56,7 @@ const Clubs = () => {
       members: 64,
       timeAgo: '6h ago',
       content: 'Speed work session at the track tonight! Interval training with our sub-8 pace group. Everyone pushed their limits and achieved new PRs. 💨⚡',
-      image: '/placeholder.svg',
+      image: '/lovable-uploads/8fdd342c-acd1-4aa8-8641-a6a99d191321.png',
       likes: 18,
       comments: 5,
       hashtags: ['#SpeedWork', '#TrackTuesday', '#NewPR'],
@@ -156,8 +156,12 @@ const Clubs = () => {
               <p className="text-slate-700 leading-relaxed text-sm md:text-base">{post.content}</p>
               
               {/* Post Image */}
-              <div className="rounded-lg overflow-hidden bg-slate-100 h-48 flex items-center justify-center">
-                <span className="text-slate-500 text-sm">📷 Club Photo</span>
+              <div className="rounded-lg overflow-hidden bg-slate-100 h-48">
+                <img 
+                  src={post.image} 
+                  alt={`${post.clubName} workout`}
+                  className="w-full h-full object-cover"
+                />
               </div>
 
               {/* Activity Tracking Section */}
