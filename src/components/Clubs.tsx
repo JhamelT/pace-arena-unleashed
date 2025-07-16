@@ -56,7 +56,7 @@ const Clubs = () => {
       members: 64,
       timeAgo: '6h ago',
       content: 'Speed work session at the track tonight! Interval training with our sub-8 pace group. Everyone pushed their limits and achieved new PRs. 💨⚡',
-      image: '/lovable-uploads/4009dcaf-4724-462f-8088-cce04866ba77.png',
+      image: '/lovable-uploads/a1919b63-ce2f-43c1-8aaa-0a41db175c38.png',
       likes: 18,
       comments: 5,
       hashtags: ['#SpeedWork', '#TrackTuesday', '#NewPR'],
