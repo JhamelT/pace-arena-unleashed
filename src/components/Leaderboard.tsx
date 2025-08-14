@@ -30,8 +30,8 @@ const Leaderboard = () => {
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-3xl font-bold text-slate-800 mb-2">Leaderboard</h2>
-        <p className="text-slate-600">Top performing clubs by pace groups</p>
+        <h2 className="text-3xl font-bold text-slate-800 mb-2">Who's Leading This Week</h2>
+        <p className="text-slate-600">Track club rankings by distance and pace.</p>
       </div>
 
       <Tabs defaultValue="short" className="w-full">

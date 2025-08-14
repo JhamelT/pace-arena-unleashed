@@ -27,8 +27,8 @@ const Dashboard = () => {
     <div className="space-y-6">
       {/* Welcome Header */}
       <div className="text-center mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">Welcome to PaceArena</h2>
-        <p className="text-sm md:text-base text-slate-600">Track performance, compete with clubs, and achieve your running goals</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">Your Running Hub</h2>
+        <p className="text-sm md:text-base text-slate-600">See your stats, track progress, and jump into challenges this week.</p>
       </div>
 
       {/* Weekly Stats Grid */}

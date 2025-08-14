@@ -117,8 +117,8 @@ const Events = () => {
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-3xl font-bold text-slate-800 mb-2">Events</h2>
-        <p className="text-slate-600">Discover and join running events</p>
+        <h2 className="text-3xl font-bold text-slate-800 mb-2">Find Your Next Race</h2>
+        <p className="text-slate-600">Browse marathons, halves, and local club runs.</p>
       </div>
 
       <Tabs defaultValue="public" className="w-full">

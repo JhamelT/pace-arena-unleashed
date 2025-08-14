@@ -71,8 +71,8 @@ const Setup = () => {
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-3xl font-bold text-slate-800 mb-2">Setup</h2>
-        <p className="text-slate-600">Create your running club or join as an individual member</p>
+        <h2 className="text-3xl font-bold text-slate-800 mb-2">Get Started</h2>
+        <p className="text-slate-600">Build your club profile or join as an individual to start competing.</p>
       </div>
 
       <Tabs defaultValue="club" className="w-full">

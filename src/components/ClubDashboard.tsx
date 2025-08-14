@@ -64,10 +64,11 @@ const ClubDashboard = () => {
     <div className="space-y-4 pb-4">
       {/* Club Header */}
       <div className="text-center mb-6">
-        <h2 className="text-xl md:text-2xl font-bold text-slate-800 mb-1">{userClub.name}</h2>
+        <h2 className="text-xl md:text-2xl font-bold text-slate-800 mb-2">Your Club's Command Center</h2>
+        <p className="text-sm md:text-base text-slate-600 mb-3">Track members, miles, and performance growth.</p>
         <div className="flex items-center justify-center space-x-2 text-sm text-slate-600">
           <MapPin className="w-4 h-4" />
-          <span>{userClub.location}</span>
+          <span>{userClub.name} • {userClub.location}</span>
         </div>
         <p className="text-xs text-slate-500 mt-1">Member since {new Date(userClub.joinedDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
       </div>

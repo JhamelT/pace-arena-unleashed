@@ -99,8 +99,8 @@ const Clubs = () => {
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">Clubs</h2>
-        <p className="text-sm md:text-base text-slate-600 mb-3">Connect with your running community</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">Discover & Join Clubs</h2>
+        <p className="text-sm md:text-base text-slate-600 mb-3">Meet runners, share updates, and grow your community.</p>
         <p className="text-xs md:text-sm text-slate-500 leading-relaxed max-w-2xl mx-auto">
           Analytics and insights for running communities. Track your progress, optimize performance, and scale club engagement.
         </p>
