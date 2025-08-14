@@ -1,17 +1,44 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, MapPin, Users, Clock, Cloud, Sun, CloudRain, Navigation } from 'lucide-react';
+import { Calendar, MapPin, Users, Clock, Cloud, Sun, CloudRain, Navigation, Heart, MessageCircle } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import EventRegistrationDialog from '@/components/EventRegistrationDialog';
+
+interface Event {
+  id: string;
+  name: string;
+  description: string;
+  event_type: string;
+  date: string;
+  time: string;
+  location: string;
+  distance: string;
+  latitude?: number;
+  longitude?: number;
+  address?: string;
+  city?: string;
+  state?: string;
+  is_club_event: boolean;
+  max_participants?: number;
+  registration_deadline?: string;
+  created_at: string;
+  likes?: { count: number; user_has_liked: boolean };
+  comments?: { count: number };
+}
 
 const Events = () => {
   const [selectedClub, setSelectedClub] = useState('');
   const [locationPermission, setLocationPermission] = useState<'prompt' | 'granted' | 'denied'>('prompt');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [publicEvents, setPublicEvents] = useState<Event[]>([]);
+  const [clubEvents, setClubEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   const requestLocation = async () => {
     if (!navigator.geolocation) {
@@ -28,82 +55,183 @@ const Events = () => {
         });
       });
 
-      setUserLocation({
+      const newLocation = {
         lat: position.coords.latitude,
         lng: position.coords.longitude
-      });
+      };
+      
+      setUserLocation(newLocation);
       setLocationPermission('granted');
+      
+      // Fetch nearby events when location is enabled
+      await fetchNearbyEvents(newLocation.lat, newLocation.lng);
+      
     } catch (error) {
       console.error('Error getting location:', error);
       setLocationPermission('denied');
     }
   };
 
-  const publicEvents = [
-    {
-      name: 'NYC Marathon',
-      date: 'Nov 5, 2024',
-      time: '8:00 AM',
-      location: 'Central Park, Manhattan',
-      distance: '26.2 miles',
-      participants: 2400,
-      weather: 'sunny',
-      category: 'Marathon'
-    },
-    {
-      name: 'Brooklyn Half Marathon',
-      date: 'Oct 28, 2024',
-      time: '7:30 AM',
-      location: 'Prospect Park, Brooklyn',
-      distance: '13.1 miles',
-      participants: 1200,
-      weather: 'overcast',
-      category: 'Half Marathon'
-    },
-    {
-      name: 'Queens 10K Run',
-      date: 'Oct 15, 2024',
-      time: '9:00 AM',
-      location: 'Flushing Meadows Park',
-      distance: '6.2 miles',
-      participants: 800,
-      weather: 'rainy',
-      category: '10K'
-    },
-  ];
+  const fetchNearbyEvents = async (lat: number, lng: number) => {
+    try {
+      const { data, error } = await supabase.rpc('get_nearby_events', {
+        user_lat: lat,
+        user_lng: lng,
+        radius_miles: 25
+      });
 
-  const clubEvents = [
-    {
-      club: 'Brooklyn Bridge Runners',
-      name: 'Weekly Long Run',
-      date: 'Every Sunday',
-      time: '7:00 AM',
-      location: 'Brooklyn Bridge Park',
-      distance: '8-12 miles',
-      paceGroups: ['7:30', '8:00', '8:30'],
-      weather: 'sunny'
-    },
-    {
-      club: 'Central Park Pacers',
-      name: 'Speed Work Wednesday',
-      date: 'Every Wednesday',
-      time: '6:30 PM',
-      location: 'Central Park Reservoir',
-      distance: '5K intervals',
-      paceGroups: ['7:00', '7:30', '8:00'],
-      weather: 'overcast'
-    },
-    {
-      club: 'Queens Distance Club',
-      name: 'Marathon Training',
-      date: 'Saturdays',
-      time: '6:00 AM',
-      location: 'Astoria Park',
-      distance: '15-20 miles',
-      paceGroups: ['8:00', '8:30', '9:00'],
-      weather: 'sunny'
-    },
-  ];
+      if (error) {
+        console.error('Error fetching nearby events:', error);
+        return;
+      }
+
+      // Filter and categorize events
+      const nearbyPublicEvents = data ? data.filter((event: Event) => !event.is_club_event) : [];
+      const nearbyClubEvents = data ? data.filter((event: Event) => event.is_club_event) : [];
+      
+      setPublicEvents(nearbyPublicEvents);
+      setClubEvents(nearbyClubEvents);
+      
+      toast({
+        title: "Location Updated",
+        description: `Found ${nearbyPublicEvents.length} public events and ${nearbyClubEvents.length} club events within 25 miles.`,
+      });
+    } catch (error) {
+      console.error('Error fetching nearby events:', error);
+    }
+  };
+
+  const fetchAllEvents = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .select(`
+          *,
+          likes:likes(count),
+          comments:comments(count)
+        `)
+        .order('date', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching events:', error);
+        return;
+      }
+
+      // Separate public and club events
+      const allPublicEvents = data?.filter(event => !event.is_club_event) || [];
+      const allClubEvents = data?.filter(event => event.is_club_event) || [];
+      
+      setPublicEvents(allPublicEvents);
+      setClubEvents(allClubEvents);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    }
+  };
+
+  const handleLike = async (eventId: string, currentlyLiked: boolean) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to like events.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (currentlyLiked) {
+        // Remove like
+        const { error } = await supabase
+          .from('likes')
+          .delete()
+          .eq('event_id', eventId)
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+      } else {
+        // Add like
+        const { error } = await supabase
+          .from('likes')
+          .insert([{ event_id: eventId, user_id: user.id }]);
+
+        if (error) throw error;
+      }
+
+      // Refresh events to update like counts
+      if (userLocation) {
+        await fetchNearbyEvents(userLocation.lat, userLocation.lng);
+      } else {
+        await fetchAllEvents();
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update like. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleComment = async (eventId: string, commentText: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to comment on events.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('comments')
+        .insert([{ 
+          event_id: eventId, 
+          user_id: user.id, 
+          content: commentText 
+        }]);
+
+      if (error) throw error;
+
+      // Refresh events to update comment counts
+      if (userLocation) {
+        await fetchNearbyEvents(userLocation.lat, userLocation.lng);
+      } else {
+        await fetchAllEvents();
+      }
+
+      toast({
+        title: "Comment Added",
+        description: "Your comment has been posted successfully.",
+      });
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add comment. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  useEffect(() => {
+    const loadEvents = async () => {
+      setLoading(true);
+      if (userLocation) {
+        await fetchNearbyEvents(userLocation.lat, userLocation.lng);
+      } else {
+        await fetchAllEvents();
+      }
+      setLoading(false);
+    };
+
+    loadEvents();
+  }, [userLocation]);
 
   const getWeatherIcon = (weather: string) => {
     switch (weather) {
@@ -113,6 +241,26 @@ const Events = () => {
       default: return <Sun className="w-4 h-4 text-yellow-500" />;
     }
   };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric' 
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center mb-6">
+          <h2 className="text-3xl font-bold text-slate-800 mb-2">Find Your Next Race</h2>
+          <p className="text-slate-600">Loading events...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -194,51 +342,87 @@ const Events = () => {
             </Card>
           )}
 
-          {publicEvents.map((event, index) => (
-            <Card key={index} className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-lg font-bold text-slate-800">{event.name}</CardTitle>
-                    <div className="flex items-center space-x-4 mt-2 text-sm text-slate-600">
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>{event.date}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-4 h-4" />
-                        <span>{event.time}</span>
-                      </div>
-                      {getWeatherIcon(event.weather)}
-                    </div>
-                  </div>
-                  <Badge variant="outline" className="text-purple-600 border-purple-600">
-                    {event.category}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center space-x-2 text-slate-700">
-                  <MapPin className="w-4 h-4 text-slate-500" />
-                  <span>{event.location}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <span className="text-sm text-slate-600">Distance: {event.distance}</span>
-                    <div className="flex items-center space-x-1">
-                      <Users className="w-4 h-4 text-slate-500" />
-                      <span className="text-sm text-slate-600">{event.participants} registered</span>
-                    </div>
-                  </div>
-                </div>
-                <EventRegistrationDialog eventName={event.name} eventType="public">
-                  <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
-                    Register for Event
-                  </Button>
-                </EventRegistrationDialog>
+          {publicEvents.length === 0 ? (
+            <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+              <CardContent className="p-6 text-center">
+                <p className="text-slate-600">No public events found. Try enabling location services to see nearby events.</p>
               </CardContent>
             </Card>
-          ))}
+          ) : (
+            publicEvents.map((event) => (
+              <Card key={event.id} className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-lg font-bold text-slate-800">{event.name}</CardTitle>
+                      <div className="flex items-center space-x-4 mt-2 text-sm text-slate-600">
+                        <div className="flex items-center space-x-1">
+                          <Calendar className="w-4 h-4" />
+                          <span>{formatDate(event.date)}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Clock className="w-4 h-4" />
+                          <span>{event.time}</span>
+                        </div>
+                        {getWeatherIcon('sunny')}
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="text-purple-600 border-purple-600">
+                      {event.event_type}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center space-x-2 text-slate-700">
+                    <MapPin className="w-4 h-4 text-slate-500" />
+                    <span>{event.location}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <span className="text-sm text-slate-600">Distance: {event.distance}</span>
+                      {event.max_participants && (
+                        <div className="flex items-center space-x-1">
+                          <Users className="w-4 h-4 text-slate-500" />
+                          <span className="text-sm text-slate-600">Max: {event.max_participants}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Social interactions */}
+                  <div className="flex items-center space-x-4 pt-2 border-t border-slate-200">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleLike(event.id, event.likes?.user_has_liked || false)}
+                      className="flex items-center space-x-1 text-slate-600 hover:text-red-500"
+                    >
+                      <Heart className={`w-4 h-4 ${event.likes?.user_has_liked ? 'fill-red-500 text-red-500' : ''}`} />
+                      <span>{event.likes?.count || 0}</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center space-x-1 text-slate-600 hover:text-blue-500"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      <span>{event.comments?.count || 0}</span>
+                    </Button>
+                  </div>
+                  
+                  <EventRegistrationDialog 
+                    eventId={event.id}
+                    eventName={event.name} 
+                    eventType="public"
+                  >
+                    <Button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white">
+                      Register for Event
+                    </Button>
+                  </EventRegistrationDialog>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </TabsContent>
 
         <TabsContent value="club" className="space-y-4">
@@ -257,51 +441,77 @@ const Events = () => {
             </CardContent>
           </Card>
 
-          {clubEvents.map((event, index) => (
-            <Card key={index} className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-lg font-bold text-slate-800">{event.name}</CardTitle>
-                    <p className="text-sm text-purple-600 font-medium">{event.club}</p>
-                    <div className="flex items-center space-x-4 mt-2 text-sm text-slate-600">
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>{event.date}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-4 h-4" />
-                        <span>{event.time}</span>
-                      </div>
-                      {getWeatherIcon(event.weather)}
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center space-x-2 text-slate-700">
-                  <MapPin className="w-4 h-4 text-slate-500" />
-                  <span>{event.location}</span>
-                </div>
-                <div>
-                  <p className="text-sm text-slate-600 mb-2">Distance: {event.distance}</p>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="text-sm text-slate-600">Pace Groups:</span>
-                    {event.paceGroups.map((pace, paceIndex) => (
-                      <Badge key={paceIndex} variant="secondary" className="bg-blue-100 text-blue-700">
-                        {pace}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                <EventRegistrationDialog eventName={event.name} eventType="club">
-                  <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-                    Join Event
-                  </Button>
-                </EventRegistrationDialog>
+          {clubEvents.length === 0 ? (
+            <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+              <CardContent className="p-6 text-center">
+                <p className="text-slate-600">No club events found. Join a club to see club-specific events.</p>
               </CardContent>
             </Card>
-          ))}
+          ) : (
+            clubEvents.map((event) => (
+              <Card key={event.id} className="bg-white/60 backdrop-blur-sm border-0 shadow-lg">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-lg font-bold text-slate-800">{event.name}</CardTitle>
+                      <p className="text-sm text-purple-600 font-medium">Club Event</p>
+                      <div className="flex items-center space-x-4 mt-2 text-sm text-slate-600">
+                        <div className="flex items-center space-x-1">
+                          <Calendar className="w-4 h-4" />
+                          <span>{formatDate(event.date)}</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Clock className="w-4 h-4" />
+                          <span>{event.time}</span>
+                        </div>
+                        {getWeatherIcon('sunny')}
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center space-x-2 text-slate-700">
+                    <MapPin className="w-4 h-4 text-slate-500" />
+                    <span>{event.location}</span>
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-600 mb-2">Distance: {event.distance}</p>
+                  </div>
+                  
+                  {/* Social interactions */}
+                  <div className="flex items-center space-x-4 pt-2 border-t border-slate-200">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleLike(event.id, event.likes?.user_has_liked || false)}
+                      className="flex items-center space-x-1 text-slate-600 hover:text-red-500"
+                    >
+                      <Heart className={`w-4 h-4 ${event.likes?.user_has_liked ? 'fill-red-500 text-red-500' : ''}`} />
+                      <span>{event.likes?.count || 0}</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="flex items-center space-x-1 text-slate-600 hover:text-blue-500"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      <span>{event.comments?.count || 0}</span>
+                    </Button>
+                  </div>
+                  
+                  <EventRegistrationDialog 
+                    eventId={event.id}
+                    eventName={event.name} 
+                    eventType="club"
+                  >
+                    <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
+                      Join Event
+                    </Button>
+                  </EventRegistrationDialog>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </TabsContent>
       </Tabs>
     </div>

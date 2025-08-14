@@ -5,14 +5,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface EventRegistrationDialogProps {
+  eventId: string;
   eventName: string;
   eventType: 'public' | 'club';
   children: React.ReactNode;
 }
 
-const EventRegistrationDialog = ({ eventName, eventType, children }: EventRegistrationDialogProps) => {
+const EventRegistrationDialog = ({ eventId, eventName, eventType, children }: EventRegistrationDialogProps) => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -33,9 +35,43 @@ const EventRegistrationDialog = ({ eventName, eventType, children }: EventRegist
 
     setIsSubmitting(true);
     
-    // Simulate registration process
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to register for events.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Save registration to database
+      const { error } = await supabase
+        .from('event_registrations')
+        .insert([
+          {
+            event_id: eventId,
+            user_id: user.id,
+            full_name: name,
+            phone_number: phoneNumber,
+            registration_date: new Date().toISOString()
+          }
+        ]);
+
+      if (error) {
+        if (error.code === '23505') { // Unique constraint violation
+          toast({
+            title: "Already Registered",
+            description: "You're already registered for this event.",
+            variant: "destructive",
+          });
+          return;
+        }
+        throw error;
+      }
       
       toast({
         title: "Registration Successful!",
@@ -47,6 +83,7 @@ const EventRegistrationDialog = ({ eventName, eventType, children }: EventRegist
       setPhoneNumber('');
       setOpen(false);
     } catch (error) {
+      console.error('Registration error:', error);
       toast({
         title: "Registration Failed",
         description: "Something went wrong. Please try again.",
